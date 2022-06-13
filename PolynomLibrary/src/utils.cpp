@@ -41,7 +41,7 @@ std::vector<double> splitAndRemoveNullCoeffs(const std::string &s, char delim)
 	int i = 1;
 	while (std::getline(ss, item, delim)) // Пока строка не кончилась
 	{
-		double a = atof(item.c_str()); // Конвертация строки в вещественное число
+		double a = stof(item); // Конвертация строки в вещественное число
 		if (a || i % 2 == 0) // Если не 0 (то есть либо не число, либо ноль - но нулевые мономы не нужны)
 		{
 			elems.push_back(a); // Добавление в вектор

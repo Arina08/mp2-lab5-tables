@@ -29,25 +29,24 @@ int main()
 	{
 		try
 		{
-			std::cout << "Введите многочлен p, get для извлечения или exit для выхода: ";
+			std::cout << "Введите многочлен p, get для взятия многочлена из таблицы или exit для выхода: ";
 			std::string s1;
+			std::string key;
 			std::cin >> s1;
-
 			Polynomial p;
 
 			if (s1 == "exit")
 				break;
 			else if (s1 == "get")
 			{
-				std::string key;
 				std::cout << "Введите ключ: ";
 				std::cin >> key;
 				if (!ht->get(key, p))
 					continue;
 				ot->get(key);
-				ut->get(key);
+				p = ut->get(key);
 			}
-			else 
+			else
 				p = Polynomial(s1);
 			std::cout << "Многочлен p: " << p << std::endl;
 			while (true)
@@ -63,25 +62,51 @@ int main()
 
 					int op = atoi(s.c_str());
 
-					if (op < 0 || op > 4)
+					if (op < 0 || op > 5)
 						throw std::exception();
 					else if (op == 0)
 						break;
 					else
 					{
-						if (op < 4)
+						if (op == 5) {
+							while (true) {
+								std::cout << "Введите ключ для сохраняемого многочлена: ";
+								std::cin >> key;
+								if (ht->existsKey(key))
+									std::cout << "Такой ключ уже существует!" << std::endl;
+								else {
+									TableElement *te = new TableElement(key, p);
+									ht->add(te->key(), te->value());
+									ot->add(*te);
+									ut->add(*te);
+									break;
+								}
+							}
+						}
+						else if (op < 4)
 						{
 							while (true)
 							{
 								try
 								{
-									std::cout << "Введите многочлен q или exit для выхода: ";
+									std::cout << "Введите многочлен q, get для взятия многочлена из таблицы или exit для выхода: ";
 									std::string s2;
 									std::cin >> s2;
+									Polynomial q, r;
+
 									if (s2 == "exit")
 										break;
+									else if (s2 == "get") {
+										std::cout << "Введите ключ: ";
+										std::cin >> key;
+										if (!ht->get(key, p))
+											continue;
+										ot->get(key);
+										q = ut->get(key);
+									}
+									else
+										q = Polynomial(s2);
 
-									Polynomial q = Polynomial(s2), r;
 									std::cout << "Многочлен q: " << q << std::endl;
 									std::cout << "Результат операции ";
 									if (op == 1)
@@ -109,25 +134,21 @@ int main()
 									if (save == 1)
 									{
 										std::string key;
-										std::cout << "Введите ключ: ";
-										std::cin >> key;
+										while (true) {
+											std::cout << "Введите ключ: ";
+											std::cin >> key;
 
-										TableElement *te = new TableElement(key, r);
+											TableElement *te = new TableElement(key, r);
 
-										if (!ht->existsKey(key))
-											ht->add(te->key(), te->value());
-										else
-											std::cout << "Такой ключ в хеш-таблице уже существует!" << std::endl;
-
-										if (!ot->existsKey(*te))
-											ot->add(*te);
-										else
-											std::cout << "Такой ключ в упорядоченной таблице уже существует!" << std::endl;
-										
-										if (!ut->existsKey(key))
-											ut->add(*te);
-										else
-											std::cout << "Такой ключ в неупорядоченной таблице уже существует!" << std::endl;
+											if (!ht->existsKey(key)) {
+												ht->add(te->key(), te->value());
+												ot->add(*te);
+												ut->add(*te);
+												break;
+											}
+											else
+												std::cout << "Такой ключ уже существует!" << std::endl;
+										}
 									}
 
 									break;
@@ -154,7 +175,7 @@ int main()
 									std::cout << "Введите константу с: ";
 									std::cin >> s;
 
-									double c = atof(s.c_str());
+									double c = stof(s);
 
 									Polynomial r = p * c;
 									std::cout << "Результат операции p * c: " << r << std::endl;
@@ -167,13 +188,20 @@ int main()
 									if (save == 1)
 									{
 										std::string key;
-										std::cout << "Введите ключ: ";
-										std::cin >> key;
+										while (true) {
+											std::cout << "Введите ключ: ";
+											std::cin >> key;
 
-										TableElement *te = new TableElement(key, r);
-										ht->add(te->key(), te->value());
-										ot->add(*te);
-										ut->add(*te);
+											if (!ht->existsKey(key)) {
+												TableElement *te = new TableElement(key, r);
+												ht->add(te->key(), te->value());
+												ot->add(*te);
+												ut->add(*te);
+												break;
+											}
+											else
+												std::cout << "Такой ключ уже существует!" << std::endl;
+										}
 									}
 
 									break;
@@ -189,31 +217,27 @@ int main()
 						else
 						{
 							std::string key;
-							std::cout << "Введите ключ: ";
-							std::cin >> key;
+							while (true) {
+								std::cout << "Введите ключ: ";
+								std::cin >> key;
 
-							TableElement *te = new TableElement(key, p);
-							if (!ht->existsKey(key))
-								ht->add(te->key(), te->value());
-							else
-								std::cout << "Такой ключ в хеш-таблице уже существует!" << std::endl;
-
-							if (!ot->existsKey(*te))
-								ot->add(*te);
-							else
-								std::cout << "Такой ключ в упорядоченной таблице уже существует!" << std::endl;
-
-							if (!ut->existsKey(key))
-								ut->add(*te);
-							else
-								std::cout << "Такой ключ в неупорядоченной таблице уже существует!" << std::endl;
+								TableElement *te = new TableElement(key, p);
+								if (!ht->existsKey(key)) {
+									ht->add(te->key(), te->value());
+									ot->add(*te);
+									ut->add(*te);
+									break;
+								}
+								else
+									std::cout << "Такой ключ уже существует!" << std::endl;
+							}
 						}
 						break;
 					}
 				}
 				catch (std::exception&)
 				{
-					std::cout << "Введите число от 0 до 3!" << std::endl;
+					std::cout << "Введите число от 0 до 5!" << std::endl;
 					std::cin.clear();
 				}
 			}
